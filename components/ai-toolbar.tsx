@@ -2,13 +2,14 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Loader2, FileText, Edit, ListPlus } from 'lucide-react'
+import { Sparkles, Loader2, FileText, Edit, ListPlus, Newspaper } from 'lucide-react'
 import { aiManager } from '@/lib/ai'
 
 interface AIToolbarProps {
   selectedText?: string
   onSummarize?: (summary: string) => void
   onRewriteFormat?: (rewritten: string) => void
+  onFormatAsBlog?: (formatted: string) => void
   onExtractTasks?: (tasks: string[]) => void
   disabled?: boolean
   className?: string
@@ -18,6 +19,7 @@ export default function AIToolbar({
   selectedText = '', 
   onSummarize, 
   onRewriteFormat, 
+  onFormatAsBlog,
   onExtractTasks,
   disabled = false,
   className = '' 
@@ -43,6 +45,18 @@ export default function AIToolbar({
     try {
       const rewritten = await aiManager.rewriteAndFormatWithFallback(selectedText)
       onRewriteFormat(rewritten)
+    } finally {
+      setLoading(null)
+    }
+  }
+
+  const handleFormatAsBlog = async () => {
+    if (!selectedText.trim() || !onFormatAsBlog) return
+    
+    setLoading('blog')
+    try {
+      const formatted = await aiManager.formatAsBlogPostWithFallback(selectedText)
+      onFormatAsBlog(formatted)
     } finally {
       setLoading(null)
     }
@@ -100,6 +114,23 @@ export default function AIToolbar({
               <Edit className="h-3 w-3" />
             )}
             <span className="ml-1">Rewrite</span>
+          </Button>
+        )}
+        
+        {onFormatAsBlog && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleFormatAsBlog}
+            disabled={!hasSelectedText || disabled || isLoading}
+            className="h-8 px-2 text-xs"
+          >
+            {loading === 'blog' ? (
+              <Loader2 className="h-3 w-3 animate-spin" />
+            ) : (
+              <Newspaper className="h-3 w-3" />
+            )}
+            <span className="ml-1">Blog Format</span>
           </Button>
         )}
         

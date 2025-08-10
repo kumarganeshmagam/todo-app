@@ -9,6 +9,7 @@ export interface AIResponse {
 export interface AIProvider {
   summarize: (content: string) => Promise<AIResponse>
   rewriteAndFormat: (content: string) => Promise<AIResponse>
+  formatAsBlogPost: (content: string) => Promise<AIResponse>
   extractTasks: (content: string) => Promise<{ tasks: string[], success: boolean, error?: string }>
   speechToTask: (text: string) => Promise<{ task: string, success: boolean, error?: string }>
 }
@@ -64,6 +65,34 @@ Summary:`
 ${content}
 
 Formatted content:`
+
+    return this.makeRequest(prompt)
+  }
+
+  async formatAsBlogPost(content: string): Promise<AIResponse> {
+    const prompt = `Transform the following content into a professionally formatted blog post. Keep ALL the original information and ideas, just organize them better with proper structure and formatting.
+
+IMPORTANT RULES:
+- DO NOT remove any points, ideas, or information
+- ADD proper headings and structure 
+- PRESERVE all bullet points as HTML lists
+- KEEP all side headings and subheadings
+- ENHANCE the content, don't reduce it
+
+Format using clean HTML:
+- <h2> for main sections (not h1, that's for the title)
+- <h3> for subsections and side headings
+- <h4> for smaller subheadings
+- <p> for paragraphs
+- <ul><li> for bullet points
+- <ol><li> for numbered lists
+- <strong> for important terms
+- <em> for emphasis
+
+Content to enhance:
+${content}
+
+Enhanced blog post content:`
 
     return this.makeRequest(prompt)
   }
@@ -130,6 +159,10 @@ export class OpenAIProvider implements AIProvider {
     return { success: false, error: 'OpenAI integration not implemented' }
   }
 
+  async formatAsBlogPost(content: string): Promise<AIResponse> {
+    return { success: false, error: 'OpenAI integration not implemented' }
+  }
+
   async extractTasks(content: string): Promise<{ tasks: string[], success: boolean, error?: string }> {
     return { tasks: [], success: false, error: 'OpenAI integration not implemented' }
   }
@@ -145,6 +178,10 @@ export class ClaudeProvider implements AIProvider {
   }
 
   async rewriteAndFormat(content: string): Promise<AIResponse> {
+    return { success: false, error: 'Claude integration not implemented' }
+  }
+
+  async formatAsBlogPost(content: string): Promise<AIResponse> {
     return { success: false, error: 'Claude integration not implemented' }
   }
 
@@ -188,6 +225,15 @@ export class AIManager {
     }
   }
 
+  async formatAsBlogPostWithFallback(content: string): Promise<string> {
+    try {
+      const response = await this.provider.formatAsBlogPost(content)
+      return response.success ? response.content || content : this.fallbackMessage
+    } catch {
+      return this.fallbackMessage
+    }
+  }
+
   async extractTasksWithFallback(content: string): Promise<string[]> {
     try {
       const response = await this.provider.extractTasks(content)
@@ -209,3 +255,7 @@ export class AIManager {
 
 // Global AI manager instance
 export const aiManager = new AIManager()
+
+// For testing: uncomment the line below to use test AI instead of Ollama
+// import { TestAIProvider } from './test-ai'
+// aiManager.setProvider(new TestAIProvider())

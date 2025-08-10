@@ -87,7 +87,9 @@ h1{font-size:24px;font-weight:600;margin:0 0 20px;}
   }
 
   function handleRewriteFormat(rewritten: string) {
-    if (replaceSelection(rewritten)) {
+    // Check if the content contains HTML tags, if so render as HTML
+    const containsHTML = /<[^>]+>/.test(rewritten)
+    if (replaceSelection(rewritten, containsHTML)) {
       if (contentRef.current) {
         setContentHtml(contentRef.current.innerHTML)
       }

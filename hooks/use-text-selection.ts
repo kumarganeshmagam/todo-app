@@ -35,7 +35,7 @@ export function useTextSelection({ targetRef }: UseTextSelectionOptions = {}) {
     setSelectionRange(text ? range.cloneRange() : null)
   }, [targetRef])
 
-  const replaceSelection = useCallback((newText: string) => {
+  const replaceSelection = useCallback((newText: string, asHTML = false) => {
     if (!selectionRange) return false
 
     try {
@@ -44,10 +44,24 @@ export function useTextSelection({ targetRef }: UseTextSelectionOptions = {}) {
         selection.removeAllRanges()
         selection.addRange(selectionRange)
         
-        // Create a text node with the new content
-        const textNode = document.createTextNode(newText)
-        selectionRange.deleteContents()
-        selectionRange.insertNode(textNode)
+        if (asHTML) {
+          // Create a temporary container to parse HTML
+          const tempDiv = document.createElement('div')
+          tempDiv.innerHTML = newText
+          
+          // Insert the parsed HTML content
+          selectionRange.deleteContents()
+          
+          // Insert all child nodes from the temp div
+          while (tempDiv.firstChild) {
+            selectionRange.insertNode(tempDiv.firstChild)
+          }
+        } else {
+          // Create a text node with the new content
+          const textNode = document.createTextNode(newText)
+          selectionRange.deleteContents()
+          selectionRange.insertNode(textNode)
+        }
         
         // Clear selection
         selection.removeAllRanges()

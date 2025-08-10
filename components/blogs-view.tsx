@@ -141,8 +141,86 @@ function BlogEditor({ blog, onChange, onDelete, onClose }: BlogEditorProps) {
     w.document.open()
     w.document.write(`<!doctype html><html><head><meta charset="utf-8" />
     <title>${title}</title>
-    <style>body{font-family:system-ui,-apple-system,sans-serif;background:#fff;color:#1f2937;margin:40px;line-height:1.6}h1,h2,h3{margin:20px 0 12px} .content{max-width:760px;margin:0 auto}</style>
-    </head><body><article class="content"><h1>${(title||'Untitled').replace(/</g,'&lt;')}</h1>${contentHtml}</article></body></html>`)
+    <style>
+      body { 
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #fff;
+        color: #1f2937;
+        margin: 0;
+        padding: 60px 40px;
+        line-height: 1.7;
+      }
+      .content { 
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      h1 { 
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #111827;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.2;
+      }
+      h2 { 
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #1f2937;
+        margin: 2.5rem 0 1rem 0;
+        line-height: 1.3;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 0.5rem;
+      }
+      h3 { 
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #374151;
+        margin: 2rem 0 1rem 0;
+        line-height: 1.4;
+      }
+      p { 
+        font-size: 1.125rem;
+        margin: 1.5rem 0;
+        color: #374151;
+      }
+      ul, ol { 
+        margin: 1.5rem 0;
+        padding-left: 2rem;
+      }
+      li { 
+        font-size: 1.125rem;
+        margin: 0.75rem 0;
+        color: #374151;
+        line-height: 1.6;
+      }
+      strong { 
+        color: #111827;
+        font-weight: 600;
+      }
+      em { 
+        color: #4f46e5;
+        font-style: italic;
+      }
+      blockquote {
+        border-left: 4px solid #4f46e5;
+        padding-left: 1.5rem;
+        margin: 2rem 0;
+        color: #6b7280;
+        font-style: italic;
+      }
+      .meta {
+        color: #9ca3af;
+        font-size: 0.875rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 2rem;
+      }
+    </style>
+    </head><body><article class="content">
+      <h1>${(title||'Untitled').replace(/</g,'&lt;')}</h1>
+      <div class="meta">${wordCount} words • ${readingTimeMin} min read</div>
+      ${contentHtml}
+    </article></body></html>`)
     w.document.close()
     w.focus()
   }
@@ -186,7 +264,15 @@ function BlogEditor({ blog, onChange, onDelete, onClose }: BlogEditorProps) {
   }
 
   function handleRewriteFormat(rewritten: string) {
-    if (replaceSelection(rewritten)) {
+    // Check if the content contains HTML tags, if so render as HTML
+    const containsHTML = /<[^>]+>/.test(rewritten)
+    if (replaceSelection(rewritten, containsHTML)) {
+      setContentHtml(editorRef.current?.innerHTML ?? '')
+    }
+  }
+
+  function handleFormatAsBlog(formatted: string) {
+    if (replaceSelection(formatted, true)) { // Pass true to render as HTML
       setContentHtml(editorRef.current?.innerHTML ?? '')
     }
   }
@@ -259,6 +345,7 @@ function BlogEditor({ blog, onChange, onDelete, onClose }: BlogEditorProps) {
                 selectedText={selectedText}
                 onSummarize={handleSummarize}
                 onRewriteFormat={handleRewriteFormat}
+                onFormatAsBlog={handleFormatAsBlog}
                 className="mb-4"
               />
             )}
@@ -382,7 +469,11 @@ function BlogEditor({ blog, onChange, onDelete, onClose }: BlogEditorProps) {
               <CardContent className="p-0">
                 {preview ? (
                   <article
-                    className="prose prose-slate max-w-none p-8 min-h-[600px]"
+                    className="prose prose-slate prose-lg max-w-none p-8 min-h-[600px]"
+                    style={{
+                      fontSize: '1.125rem',
+                      lineHeight: '1.7'
+                    }}
                     dangerouslySetInnerHTML={{ __html: contentHtml }}
                   />
                 ) : (
