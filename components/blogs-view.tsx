@@ -25,7 +25,7 @@ import {
   Save,
   X
 } from 'lucide-react'
-import { useLocalStorage } from '@/hooks/use-local-storage'
+import { useHybridStorage } from '@/hooks/use-hybrid-storage'
 import { useTextSelection } from '@/hooks/use-text-selection'
 import { Blog } from '@/types'
 import AIToolbar from '@/components/ai-toolbar'
@@ -496,9 +496,9 @@ function BlogEditor({ blog, onChange, onDelete, onClose }: BlogEditorProps) {
 }
 
 export default function BlogsView() {
-  const [blogs, setBlogs] = useLocalStorage<Blog[]>('blogs', [])
-  const [selectedId, setSelectedId] = useLocalStorage<string | null>('selected-blog-id', null)
-  const [sidebarOpen, setSidebarOpen] = useLocalStorage<boolean>('blogs-sidebar-open', true)
+  const [blogs, setBlogs, isLoadingBlogs] = useHybridStorage<Blog[]>('blogs', [])
+  const [selectedId, setSelectedId] = useHybridStorage<string | null>('selected-blog-id', null)
+  const [sidebarOpen, setSidebarOpen] = useHybridStorage<boolean>('blogs-sidebar-open', true)
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Prevent hydration mismatch

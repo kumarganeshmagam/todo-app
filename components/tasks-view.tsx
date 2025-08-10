@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Check, Plus, X } from 'lucide-react'
-import { useLocalStorage } from '@/hooks/use-local-storage'
+import { useHybridStorage } from '@/hooks/use-hybrid-storage'
 import { Todo, TaskFilter } from '@/types'
 import SpeechToTask from '@/components/speech-to-task'
 import AIToolbar from '@/components/ai-toolbar'
@@ -94,8 +94,8 @@ function TodoItem({ todo, onToggle, onDelete, onEdit }: TodoItemProps) {
 }
 
 export default function TasksView() {
-  const [todos, setTodos] = useLocalStorage<Todo[]>('tasks', [])
-  const [filter, setFilter] = useLocalStorage<TaskFilter>('task-filter', 'all')
+  const [todos, setTodos, isLoadingTodos] = useHybridStorage<Todo[]>('tasks', [])
+  const [filter, setFilter] = useHybridStorage<TaskFilter>('task-filter', 'all')
   const [newTitle, setNewTitle] = useState('')
   const [selectedTasksText, setSelectedTasksText] = useState('')
   const inputRef = useRef<HTMLInputElement | null>(null)

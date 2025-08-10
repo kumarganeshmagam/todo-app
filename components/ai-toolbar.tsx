@@ -1,9 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Loader2, FileText, Edit, ListPlus, Newspaper } from 'lucide-react'
 import { aiManager } from '@/lib/ai'
+import { useOllamaStatus } from '@/hooks/use-ollama-status'
+import { AIFallback } from '@/components/ai-fallback'
 
 interface AIToolbarProps {
   selectedText?: string
@@ -24,8 +27,10 @@ export default function AIToolbar({
   disabled = false,
   className = '' 
 }: AIToolbarProps) {
+  const { data: session } = useSession()
+  const { isAvailable: ollamaAvailable } = useOllamaStatus()
   const [loading, setLoading] = useState<string | null>(null)
-
+  
   const handleSummarize = async () => {
     if (!selectedText.trim() || !onSummarize) return
     

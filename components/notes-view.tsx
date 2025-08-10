@@ -18,7 +18,7 @@ import {
   ChevronRight,
   X
 } from 'lucide-react'
-import { useLocalStorage } from '@/hooks/use-local-storage'
+import { useHybridStorage } from '@/hooks/use-hybrid-storage'
 import { useTextSelection } from '@/hooks/use-text-selection'
 import { Note } from '@/types'
 import AIToolbar from '@/components/ai-toolbar'
@@ -260,9 +260,9 @@ h1{font-size:24px;font-weight:600;margin:0 0 20px;}
 }
 
 export default function NotesView() {
-  const [notes, setNotes] = useLocalStorage<Note[]>('notes', [])
-  const [selectedId, setSelectedId] = useLocalStorage<string | null>('selected-note-id', null)
-  const [sidebarOpen, setSidebarOpen] = useLocalStorage<boolean>('notes-sidebar-open', true)
+  const [notes, setNotes, isLoadingNotes] = useHybridStorage<Note[]>('notes', [])
+  const [selectedId, setSelectedId] = useHybridStorage<string | null>('selected-note-id', null)
+  const [sidebarOpen, setSidebarOpen] = useHybridStorage<boolean>('notes-sidebar-open', true)
   const [isHydrated, setIsHydrated] = useState(false)
 
   // Prevent hydration mismatch
