@@ -107,3 +107,5 @@ All data is stored locally in your browser using localStorage. Your data persist
 ## Contributing
 
 This application was migrated from a Vite + React setup to Next.js 15 with modern tooling and shadcn/ui components for better developer experience and user interface.
+
+You can test this application [here](https://ai-todo-app-omega.vercel.app/)
